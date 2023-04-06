@@ -12,7 +12,7 @@ M.tbl_filetypes = {
     'markdown',
     'glimmer','handlebars','hbs',
     'htmldjango',
-    'heex'
+    'heex', 'elixir'
 }
 
 M.tbl_skipTag = {
@@ -76,15 +76,15 @@ local SVELTE_TAG = {
 }
 
 local HEEX_TAG = {
-    filetypes              = {'heex'},
-    start_tag_pattern      = 'start_tag|start_component',
-    start_name_tag_pattern = 'tag_name|component_name',
-    end_tag_pattern        = "end_tag|end_component",
-    end_name_tag_pattern   = "tag_name|component_name",
+    filetypes              = {'heex', 'elixir'},
+    start_tag_pattern      = 'start_tag|start_component|start_slot',
+    start_name_tag_pattern = 'tag_name|component_name|slot_name',
+    end_tag_pattern        = "end_tag|end_component|end_slot",
+    end_name_tag_pattern   = "tag_name|component_name|slot_name",
     close_tag_pattern      = 'erroneous_end_tag',
     close_name_tag_pattern = 'erroneous_end_tag_name',
     element_tag            = 'element',
-    skip_tag_pattern       = {'quoted_attribute_value', 'end_tag', 'end_component'}
+    skip_tag_pattern       = {'quoted_attribute_value', 'end_tag', 'end_component', 'end_slot'}
 }
 
 local all_tag = {
@@ -270,7 +270,7 @@ local function check_close_tag()
                 end
             end
         end
-        return true, tag_name
+        return true, tag_name, tag_node
     end
     return false
 end
@@ -279,9 +279,14 @@ M.close_tag = function ()
     local buf_parser = parsers.get_parser()
     if not buf_parser then return end
     buf_parser:parse()
-    local result, tag_name = check_close_tag()
+    local result, tag_name, tag_node = check_close_tag()
     if result == true and tag_name ~= nil then
-        vim.cmd(string.format([[normal! a</%s>]],tag_name))
+        local tag_prefix = ""
+        if tag_node:type() == "slot_name" then
+          tag_prefix = ":"
+        end
+
+        vim.cmd(string.format([[normal! a</%s%s>]], tag_prefix, tag_name))
         vim.cmd[[normal! F>]]
     end
 end
