@@ -12,7 +12,7 @@ M.tbl_filetypes = {
     'markdown',
     'glimmer','handlebars','hbs',
     'htmldjango',
-    'heex'
+    'heex', 'elixir'
 }
 
 M.tbl_skipTag = {
@@ -76,7 +76,7 @@ local SVELTE_TAG = {
 }
 
 local HEEX_TAG = {
-    filetypes              = {'heex'},
+    filetypes              = {'heex', 'elixir'},
     start_tag_pattern      = 'start_tag|start_component|start_slot',
     start_name_tag_pattern = 'tag_name|component_name|slot_name',
     end_tag_pattern        = "end_tag|end_component|end_slot",
